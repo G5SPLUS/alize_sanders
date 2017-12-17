@@ -39,6 +39,7 @@ CONFIG_BUILDTIME_EXTABLE_SORT=y
 # Kernel features
 #
 CONFIG_BOEFFLA_WL_BLOCKER=y
+CONFIG_FRANDOM=y
 
 #
 # General setup
