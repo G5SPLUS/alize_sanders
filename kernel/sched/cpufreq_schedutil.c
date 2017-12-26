@@ -632,39 +632,6 @@ static void store_tunables_data(struct sugov_tunables *tunables,
 	pr_debug("tunables data saved for cpu[%u]\n", cpu);
 }
 
-static void get_tunables_data(struct sugov_tunables *tunables,
-		struct cpufreq_policy *policy)
-{
-	struct sugov_tunables *ptunables;
-	unsigned int lat;
-	unsigned int cpu = cpumask_first(policy->related_cpus);
-
-	ptunables = &per_cpu(cached_tunables, cpu);
-	if (!ptunables)
-		goto initialize;
-
-	if (ptunables->up_rate_limit_us > 0) {
-		tunables->up_rate_limit_us = ptunables->up_rate_limit_us;
-		tunables->down_rate_limit_us = ptunables->down_rate_limit_us;
-		tunables->iowait_boost_enable = ptunables->iowait_boost_enable;
-		pr_debug("tunables data restored for cpu[%u]\n", cpu);
-		goto out;
-	}
-
-initialize:
-	tunables->up_rate_limit_us = LATENCY_MULTIPLIER;
-	tunables->down_rate_limit_us = LATENCY_MULTIPLIER;
-	lat = policy->cpuinfo.transition_latency / NSEC_PER_USEC;
-	if (lat) {
-		tunables->up_rate_limit_us *= lat;
-		tunables->down_rate_limit_us *= lat;
-	}
-	
-	pr_debug("tunables data initialized for cpu[%u]\n", cpu);
-out:
-	return;
-}
-
 static int sugov_init(struct cpufreq_policy *policy)
 {
 	struct sugov_policy *sg_policy;
